@@ -22,6 +22,8 @@ public class Config_Chapisco {
     private String STEPS_Y;
     private String STEPS_X;
     private String LARGURAFIO;
+    private Boolean ST_AL_1;
+    private Boolean ST_AL_2;
 
     public String getPULSO_POL() {
         return PULSO_POL;
@@ -36,11 +38,6 @@ public class Config_Chapisco {
     public Boolean getST_AL_2() {
         return ST_AL_2;
     }
-
-    private Boolean ST_AL_1;
-    private Boolean ST_AL_2;
-
-
 
     public boolean isDIRECAOOPRECAO() {
         return DIRECAOOPRECAO;

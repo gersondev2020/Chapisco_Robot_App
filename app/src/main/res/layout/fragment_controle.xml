@@ -139,9 +139,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/setaparadireita"
                     android:textSize="25dp" />
-
             </LinearLayout>
-
             <Button
                 android:id="@+id/btnYmenos"
                 android:layout_width="100dp"

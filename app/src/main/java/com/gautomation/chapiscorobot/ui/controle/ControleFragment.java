@@ -1,5 +1,6 @@
 package com.gautomation.chapiscorobot.ui.controle;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -47,14 +48,17 @@ public class ControleFragment extends Fragment {
     private String ValorFinal = "0";
     private Button Ymais, Ymenos, Xmais, Xmenos, btngravainicio, btngravafinal, btnIniciar;
     private TextView txtStepsY, txtStepsX;
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
     private Switch SWdirecaodeoperaco;
-
-    private ControleViewModel controleViewModel;
+    private boolean Ymais_parar;
+    Timer myTimer = new Timer();
+    private boolean Ymenos_parar;
+    private boolean Xmais_parar;
+    private boolean Xmenos_parar;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        controleViewModel =
-                new ViewModelProvider(this).get(ControleViewModel.class);
+
         View root = inflater.inflate(R.layout.fragment_controle, container, false);
 
         Ymais = root.findViewById(R.id.btnYmais);
@@ -79,58 +83,92 @@ public class ControleFragment extends Fragment {
         btngravafinal.setOnClickListener(v -> {
             GravaPontoFinal(Integer.parseInt(Valor));
         });
+
+        // BOTÃO MAIS Y ==============
         Ymais.setOnLongClickListener(v -> {
             ComandosManual(11);
             return false;
         });
         Ymais.setOnClickListener(v -> {
             ComandosManual(22);
+            Ymais_parar = true;
         });
+        // ============================
+        // BOTÃO MENOS Y ==============
         Ymenos.setOnLongClickListener(v -> {
             ComandosManual(33);
             return false;
         });
         Ymenos.setOnClickListener(v -> {
             ComandosManual(44);
+            Ymenos_parar = true;
         });
+        // =============================
+
+        // BOTÃO MAIS X ==============
         Xmais.setOnLongClickListener(v -> {
-            ComandosManual(77);
-            return false;
-        });
-        Xmais.setOnClickListener(v -> {
-            ComandosManual(88);
-        });
-        Xmenos.setOnLongClickListener(v -> {
             ComandosManual(55);
             return false;
         });
-        Xmenos.setOnClickListener(v -> {
+        Xmais.setOnClickListener(v -> {
             ComandosManual(66);
+            Xmais_parar = true;
         });
+        // =============================
+        // BOTÃO MENOS X ==============
+        Xmenos.setOnLongClickListener(v -> {
+            ComandosManual(77);
+            return false;
+        });
+        Xmenos.setOnClickListener(v -> {
+            ComandosManual(88);
+            Xmenos_parar = true;
+        });
+        // ==============================
         btnIniciar.setOnClickListener(v -> ComandosManual(200));
 
         SWdirecaodeoperaco.setOnClickListener(v -> {
             ComandosManual(100);
         });
-        controleViewModel.getText().observe(getViewLifecycleOwner(),
-                new Observer<String>() {
-                    @Override
-                    public void onChanged(@Nullable String s) {
 
-                    }
-                });
+//        myTimer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                controledeparada();
+//            }
+//
+//        }, 0, 100);
+
         return root;
     }
+    void controledeparada(){
+        if(Ymais_parar){
+            ComandosManual(22);
+            //Ymais_parar = false;
+        }
+        if(Ymenos_parar){
+            ComandosManual(44);
+            //Ymenos_parar = false;
+        }
+        if(Xmais_parar){
+            ComandosManual(66);
+            //Xmais_parar = false;
+        }
+        if(Xmenos_parar){
+            ComandosManual(88);
+            //Xmenos_parar = false;
+        }
+    }
+
     private void getDadosEsp() {
         Config_Chapisco_Service Config = retrofit.create(Config_Chapisco_Service.class);
         Call<Config_Chapisco> call = Config.RecuperaConfiguraoes();
 
         call.enqueue(new Callback<Config_Chapisco>() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onResponse(Call<Config_Chapisco> call, Response<Config_Chapisco> response) {
                 if (response.isSuccessful()) {
-//                    if(cont > 10)
-//                        myTimer.cancel();
                     Config_Chapisco dados = response.body();
                     assert dados != null;
                     ValorInicial = dados.getVALORINICIAL();
@@ -175,6 +213,7 @@ public class ControleFragment extends Fragment {
         Call<ControManual> call = SalvaConfig.Controles( v );
 
         call.enqueue(new Callback<ControManual>() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onResponse(Call<ControManual> call, Response<ControManual> response) {
                 if( response.isSuccessful() ){
@@ -207,6 +246,22 @@ public class ControleFragment extends Fragment {
                             Xmais.setText("");
                             Xmenos.setText("<<");
                         }
+                    }
+                    if(CONTR.getPARADOMAISY() != 1){
+                        //ComandosManual(22);
+                        Ymais_parar = false;
+                    }
+                    if(CONTR.getPARADOMENOSY() != 1){
+                        //ComandosManual(44);
+                        Ymenos_parar = false;
+                    }
+                    if(CONTR.getPARADOMAISX() != 1){
+                        //ComandosManual(66);
+                        Xmais_parar = false;
+                    }
+                    if(CONTR.getPARADOMENOSX() != 1){
+                        //ComandosManual(88);
+                        Xmenos_parar = false;
                     }
                     if(CONTR.isREINICIAR()){
                         Toast.makeText(getActivity(), "Dados Limpos",Toast.LENGTH_SHORT).show();
@@ -277,6 +332,7 @@ public class ControleFragment extends Fragment {
             }
         });
     }
+
     // =================== Menus =================================
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -304,7 +360,7 @@ public class ControleFragment extends Fragment {
     }
     @Override
     public void onStop() {
-
+        myTimer.cancel();
         super.onStop();
     }
     @Override

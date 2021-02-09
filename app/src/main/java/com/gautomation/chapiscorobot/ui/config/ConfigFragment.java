@@ -33,7 +33,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ConfigFragment extends Fragment {
 
-    private ConfigViewModel configViewModel;
     private Retrofit retrofit;
     EditText  QTD_FRISOS;
     EditText  FIO_SOLDA_POR_FRISO;
@@ -51,8 +50,6 @@ public class ConfigFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        configViewModel =
-                new ViewModelProvider(this).get(ConfigViewModel.class);
         View root = inflater.inflate(R.layout.fragment_config, container, false);
 
         Radio1pol = root.findViewById(R.id.radio1pol);
@@ -79,16 +76,7 @@ public class ConfigFragment extends Fragment {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        configViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-
-                //textView.setText(s);
-            }
-        });
-        //editPulsosPolegadas.setText(Polegadas_Pulso);
-
-        return root;
+         return root;
     }
     @Override
     public void onResume() {

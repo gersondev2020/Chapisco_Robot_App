@@ -33,12 +33,9 @@ public class InfoFragment extends Fragment {
     Timer myTimer = new Timer();
     TextView txtPulsosY, txtFiosdesolda, txtPulsosX, txtFrisosSoladados, txtLarguraFio, txtTempoGiro, txtPontoInicialX, txtPontoInicialY;
 
-    private InfoViewModel infoViewModel;
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        infoViewModel =
-                new ViewModelProvider(this).get(InfoViewModel.class);
+
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
         txtPulsosY = root.findViewById(R.id.txtPulsosY);
         txtPontoInicialY = root.findViewById(R.id.txtPontoInicialY);
@@ -54,7 +51,6 @@ public class InfoFragment extends Fragment {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-
         myTimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -64,12 +60,7 @@ public class InfoFragment extends Fragment {
 
         }, 0, 500);
 
-        infoViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
 
-            }
-        });
         return root;
     }
 
