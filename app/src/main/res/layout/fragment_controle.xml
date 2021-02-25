@@ -127,10 +127,11 @@
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_margin="16dp"
-
                     android:layout_weight="1"
+                    android:rotation="0"
+                    android:rotationX="0"
                     android:text="Iniciar Chapisco"
-                    android:textSize="10sp" />
+                    android:textSize="11sp" />
 
                 <Button
                     android:id="@+id/btnXmais"
@@ -146,6 +147,30 @@
                 android:layout_height="75dp"
                 android:background="@drawable/setaparacima"
                 android:textSize="25dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnArame1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:text="Arame 1" />
+
+                <Button
+                    android:id="@+id/btnArame2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:text="Arame 2" />
+
+            </LinearLayout>
 
             <Switch
                 android:id="@+id/sw"

@@ -7,6 +7,6 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FDFCFD</color>
-    <color name="BTNON">#750310</color>
-    <color name="BTNOFF">#049104</color>
+    <color name="BTNON">#F6112B</color>
+    <color name="BTNOFF">#03F603</color>
 </resources>

@@ -1,9 +1,8 @@
 package com.gautomation.chapiscorobot.ui.controle;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,29 +14,28 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.BoolRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.gautomation.chapiscorobot.R;
+import com.gautomation.chapiscorobot.RecumperarDados;
 import com.gautomation.chapiscorobot.api.Config_Chapisco_Service;
-import com.gautomation.chapiscorobot.model.Config_Chapisco;
+import com.gautomation.chapiscorobot.model.Get_Dados;
 import com.gautomation.chapiscorobot.model.ValorInicial;
 import com.gautomation.chapiscorobot.model.ValorFinal;
 import com.gautomation.chapiscorobot.model.ControManual;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Body;
 
-import static android.content.ContentValues.TAG;
 
 public class ControleFragment extends Fragment {
 
@@ -46,15 +44,15 @@ public class ControleFragment extends Fragment {
     //Timer myTimer = new Timer();
     private String ValorInicial = "0";
     private String ValorFinal = "0";
-    private Button Ymais, Ymenos, Xmais, Xmenos, btngravainicio, btngravafinal, btnIniciar;
+    private Button Ymais, Ymenos, Xmais, Xmenos, btngravainicio, btngravafinal, btnIniciar,
+            btnArame1,
+            btnArame2;
     private TextView txtStepsY, txtStepsX;
+    private boolean StatusChapisco = false;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     private Switch SWdirecaodeoperaco;
-    private boolean Ymais_parar;
     Timer myTimer = new Timer();
-    private boolean Ymenos_parar;
-    private boolean Xmais_parar;
-    private boolean Xmenos_parar;
+    private boolean flag;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -71,65 +69,123 @@ public class ControleFragment extends Fragment {
         txtStepsX = root.findViewById(R.id.txtStepsX);
         btnIniciar = root.findViewById(R.id.btnIniciar);
         btnIniciar.setVisibility(View.INVISIBLE);
+        btnArame1 = root.findViewById(R.id.btnArame1);
+        btnArame2 = root.findViewById(R.id.btnArame2);
         SWdirecaodeoperaco = root.findViewById(R.id.sw);
 
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://192.168.4.1/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
         btngravainicio.setOnClickListener(v -> {
-            GravaPontoInicial(Integer.parseInt(Valor));
+           if(Integer.parseInt(Valor) > Integer.parseInt(ValorFinal )) {
+               GravaPontoInicial(Integer.parseInt(Valor));
+           }else{
+               Toast.makeText(getActivity(), "Posição Invalida",Toast.LENGTH_SHORT).show();
+           }
         });
         btngravafinal.setOnClickListener(v -> {
-            GravaPontoFinal(Integer.parseInt(Valor));
-        });
+            if(Integer.parseInt(Valor) < Integer.parseInt(ValorInicial)) {
+                GravaPontoFinal(Integer.parseInt(Valor));
+           }else{
+                Toast.makeText(getActivity(), "Posição Invalida",Toast.LENGTH_SHORT).show();
 
+            }
+        });
         // BOTÃO MAIS Y ==============
         Ymais.setOnLongClickListener(v -> {
-            ComandosManual(11);
+            if(!StatusChapisco){
+                ComandosManual(11);
+                flag = true;
+            }
+
             return false;
         });
         Ymais.setOnClickListener(v -> {
-            ComandosManual(22);
-            Ymais_parar = true;
+            if(flag){
+                ComandosManual(22);
+                flag = false;
+            }else{
+                ComandosManual(222);
+            }
         });
         // ============================
         // BOTÃO MENOS Y ==============
         Ymenos.setOnLongClickListener(v -> {
-            ComandosManual(33);
+            if(!StatusChapisco) {
+                ComandosManual(33);
+                flag = true;
+            }
             return false;
         });
         Ymenos.setOnClickListener(v -> {
-            ComandosManual(44);
-            Ymenos_parar = true;
+            if(flag){
+                ComandosManual(44);
+                flag = false;
+            }else{
+                ComandosManual(444);
+            }
+
         });
         // =============================
 
         // BOTÃO MAIS X ==============
         Xmais.setOnLongClickListener(v -> {
-            ComandosManual(55);
+            if(!StatusChapisco) {
+                ComandosManual(55);
+                flag = true;
+            }
             return false;
         });
         Xmais.setOnClickListener(v -> {
-            ComandosManual(66);
-            Xmais_parar = true;
+            if(flag){
+                ComandosManual(66);
+                flag = false;
+            }else{
+                ComandosManual(666);
+            }
         });
         // =============================
         // BOTÃO MENOS X ==============
         Xmenos.setOnLongClickListener(v -> {
-            ComandosManual(77);
+            if(!StatusChapisco) {
+                ComandosManual(77);
+                flag = true;
+            }
             return false;
         });
         Xmenos.setOnClickListener(v -> {
-            ComandosManual(88);
-            Xmenos_parar = true;
+            if(flag){
+                ComandosManual(88);
+                flag = false;
+            }else{
+                ComandosManual(888);
+            }
         });
         // ==============================
-        btnIniciar.setOnClickListener(v -> ComandosManual(200));
+        btnIniciar.setOnClickListener(v ->ComandosManual(200));
+
+        // BOTÃO ARAME 1 ==============
+        btnArame1.setOnLongClickListener(v -> {
+            ComandosManual(110);
+             return false;
+        });
+        btnArame1.setOnClickListener(v -> {ComandosManual(120);});
+
+        // BOTÃO ARAME 2 ==============
+        btnArame2.setOnLongClickListener(v -> {
+            ComandosManual(130);
+            return false;
+        });
+        btnArame2.setOnClickListener(v -> {ComandosManual(140);});
+
 
         SWdirecaodeoperaco.setOnClickListener(v -> {
             ComandosManual(100);
         });
+
+
 
 //        myTimer.schedule(new TimerTask() {
 //            @Override
@@ -141,35 +197,18 @@ public class ControleFragment extends Fragment {
 
         return root;
     }
-    void controledeparada(){
-        if(Ymais_parar){
-            ComandosManual(22);
-            //Ymais_parar = false;
-        }
-        if(Ymenos_parar){
-            ComandosManual(44);
-            //Ymenos_parar = false;
-        }
-        if(Xmais_parar){
-            ComandosManual(66);
-            //Xmais_parar = false;
-        }
-        if(Xmenos_parar){
-            ComandosManual(88);
-            //Xmenos_parar = false;
-        }
-    }
+
 
     private void getDadosEsp() {
         Config_Chapisco_Service Config = retrofit.create(Config_Chapisco_Service.class);
-        Call<Config_Chapisco> call = Config.RecuperaConfiguraoes();
+        Call<Get_Dados> call = Config.RecuperaConfiguraoes();
 
-        call.enqueue(new Callback<Config_Chapisco>() {
+        call.enqueue(new Callback<Get_Dados>() {
             @SuppressLint("SetTextI18n")
             @Override
-            public void onResponse(Call<Config_Chapisco> call, Response<Config_Chapisco> response) {
+            public void onResponse(Call<Get_Dados> call, Response<Get_Dados> response) {
                 if (response.isSuccessful()) {
-                    Config_Chapisco dados = response.body();
+                    Get_Dados dados = response.body();
                     assert dados != null;
                     ValorInicial = dados.getVALORINICIAL();
                     ValorFinal = dados.getVALORFINAL();
@@ -177,19 +216,26 @@ public class ControleFragment extends Fragment {
                     btngravafinal.setText("Final Solda\n"+ValorFinal);
                     int i1 = Integer.parseInt(ValorInicial);
                     int i2 = Integer.parseInt(ValorFinal);
+
                     if(i1 == 0 || i2 == 0 || i1 <= i2) {
                         btnIniciar.setVisibility(View.INVISIBLE);
                     }else{
                         btnIniciar.setVisibility(View.VISIBLE);
                     }
                     txtStepsY.setText("Eixo Y\n"+dados.getSTEPS_Y());
+                    Valor = dados.getSTEPS_Y();
                     txtStepsX.setText("Eixo X\n"+dados.getSTEPS_X());
-                    if(dados.isCHAPISCO_STATUS()){
-                        btnIniciar.setBackgroundResource(R.color.BTNON);
+                    if (dados.isCHAPISCO_STATUS()) {
+                        //btnIniciar.setBackgroundResource(R.color.BTNOFF);
                         btnIniciar.setText("Parar Chapisco ?");
-                    }else{
-                        btnIniciar.setBackgroundResource(R.color.BTNOFF);
+                        btnIniciar.setTextColor(getResources().getColor(R.color.BTNON));
+                        StatusChapisco = true;
+                    } else {
+                        //btnIniciar.setBackgroundResource(R.color.BTNON);
                         btnIniciar.setText("Iniciar Chapisco ?");
+                        btnIniciar.setTextColor(getResources().getColor(R.color.BTNOFF));
+                        StatusChapisco = false;
+
                     }
                     if(dados.isDIRECAOOPRECAO()){
                         SWdirecaodeoperaco.setChecked(true);
@@ -203,7 +249,7 @@ public class ControleFragment extends Fragment {
                 }
             }
             @Override
-            public void onFailure(Call<Config_Chapisco> call, Throwable t) {
+            public void onFailure(Call<Get_Dados> call, Throwable t) {
 
             }
         });
@@ -218,8 +264,24 @@ public class ControleFragment extends Fragment {
             public void onResponse(Call<ControManual> call, Response<ControManual> response) {
                 if( response.isSuccessful() ){
                     ControManual CONTR = response.body();
+                    int Codigo = response.code();
                     assert CONTR != null;
-
+                    if(v == 22 && Codigo != 201){
+                        ComandosManual(22);
+                        Toast.makeText(getActivity(), "Codigo "+response.code(),Toast.LENGTH_SHORT).show();
+                    }
+                    if(v == 44 && Codigo != 201){
+                        ComandosManual(44);
+                        Toast.makeText(getActivity(), "Codigo "+response.code(),Toast.LENGTH_SHORT).show();
+                    }
+                    if(v == 66 && Codigo != 201){
+                        ComandosManual(66);
+                        Toast.makeText(getActivity(), "Codigo "+response.code(),Toast.LENGTH_SHORT).show();
+                    }
+                    if(v == 88 && Codigo != 201){
+                        ComandosManual(88);
+                        Toast.makeText(getActivity(), "Codigo "+response.code(),Toast.LENGTH_SHORT).show();
+                    }
                     if(CONTR.getSTEPS_Y() != null){
                         txtStepsY.setText("Eixo Y\n"+CONTR.getSTEPS_Y());
                         Valor = CONTR.getSTEPS_Y();
@@ -229,11 +291,15 @@ public class ControleFragment extends Fragment {
                     }
                     if(v == 200) {
                         if (CONTR.isCHAPISCO_STATUS()) {
-                            btnIniciar.setBackgroundResource(R.color.BTNON);
+                            //btnIniciar.setBackgroundResource(R.color.BTNOFF);
                             btnIniciar.setText("Parar Chapisco ?");
+                            btnIniciar.setTextColor(getResources().getColor(R.color.BTNON));
+                            StatusChapisco = true;
                         } else {
-                            btnIniciar.setBackgroundResource(R.color.BTNOFF);
+                            //btnIniciar.setBackgroundResource(R.color.BTNON);
                             btnIniciar.setText("Iniciar Chapisco ?");
+                            btnIniciar.setTextColor(getResources().getColor(R.color.BTNOFF));
+                            StatusChapisco = false;
                         }
                     }
                     if(v == 100){
@@ -246,22 +312,6 @@ public class ControleFragment extends Fragment {
                             Xmais.setText("");
                             Xmenos.setText("<<");
                         }
-                    }
-                    if(CONTR.getPARADOMAISY() != 1){
-                        //ComandosManual(22);
-                        Ymais_parar = false;
-                    }
-                    if(CONTR.getPARADOMENOSY() != 1){
-                        //ComandosManual(44);
-                        Ymenos_parar = false;
-                    }
-                    if(CONTR.getPARADOMAISX() != 1){
-                        //ComandosManual(66);
-                        Xmais_parar = false;
-                    }
-                    if(CONTR.getPARADOMENOSX() != 1){
-                        //ComandosManual(88);
-                        Xmenos_parar = false;
                     }
                     if(CONTR.isREINICIAR()){
                         Toast.makeText(getActivity(), "Dados Limpos",Toast.LENGTH_SHORT).show();
@@ -277,6 +327,8 @@ public class ControleFragment extends Fragment {
             @Override
             public void onFailure(Call<ControManual> call, Throwable t) {
                 SWdirecaodeoperaco.setChecked(false);
+                Toast.makeText(getActivity(), "Falha",Toast.LENGTH_SHORT).show();
+
             }
         });
     }

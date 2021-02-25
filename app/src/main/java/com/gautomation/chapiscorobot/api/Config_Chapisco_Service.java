@@ -1,6 +1,6 @@
 package com.gautomation.chapiscorobot.api;
 
-import com.gautomation.chapiscorobot.model.Config_Chapisco;
+import com.gautomation.chapiscorobot.model.Get_Dados;
 import com.gautomation.chapiscorobot.model.ControManual;
 import com.gautomation.chapiscorobot.model.SalvarConfig;
 import com.gautomation.chapiscorobot.model.ValorFinal;
@@ -14,7 +14,7 @@ import retrofit2.http.POST;
 
 public interface Config_Chapisco_Service {
     @GET("getdados")
-    Call<Config_Chapisco> RecuperaConfiguraoes();
+    Call<Get_Dados> RecuperaConfiguraoes();
 
 //    @POST("config")
 //    Call<SalvarConfig> SalvaConfiguracoes(@Body SalvarConfig salvarConfig);

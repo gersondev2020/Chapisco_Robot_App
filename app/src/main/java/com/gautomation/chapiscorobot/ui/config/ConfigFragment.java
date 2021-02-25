@@ -17,10 +17,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 
-import com.gautomation.chapiscorobot.model.Config_Chapisco;
+import com.gautomation.chapiscorobot.model.Get_Dados;
 import com.gautomation.chapiscorobot.api.Config_Chapisco_Service;
 import com.gautomation.chapiscorobot.model.SalvarConfig;
 
@@ -85,13 +83,13 @@ public class ConfigFragment extends Fragment {
     }
     private void getDadosEsp(){
         Config_Chapisco_Service Config = retrofit.create( Config_Chapisco_Service.class );
-        Call<Config_Chapisco> call = Config.RecuperaConfiguraoes();
+        Call<Get_Dados> call = Config.RecuperaConfiguraoes();
 
-        call.enqueue(new Callback<Config_Chapisco>() {
+        call.enqueue(new Callback<Get_Dados>() {
             @Override
-            public void onResponse(Call<Config_Chapisco> call, Response<Config_Chapisco> response) {
+            public void onResponse(Call<Get_Dados> call, Response<Get_Dados> response) {
                 if( response.isSuccessful() ){
-                    Config_Chapisco dados = response.body();
+                    Get_Dados dados = response.body();
                     assert dados != null;
                     Polegadas_Pulso = Integer.parseInt(dados.getPULSO_POL());
                     DISTANCIA_ENTRE_FRISOS(Integer.parseInt(dados.getDISTANCIA_ENTRE_FRISOS()));
@@ -120,7 +118,7 @@ public class ConfigFragment extends Fragment {
                 }
             }
             @Override
-            public void onFailure(Call<Config_Chapisco> call, Throwable t) {
+            public void onFailure(Call<Get_Dados> call, Throwable t) {
 
             }
         });

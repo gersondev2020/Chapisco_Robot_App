@@ -1,6 +1,6 @@
 package com.gautomation.chapiscorobot.model;
 
-public class Config_Chapisco {
+public class Get_Dados {
 
     private String VALORINICIAL;
     private String VALORFINAL;
