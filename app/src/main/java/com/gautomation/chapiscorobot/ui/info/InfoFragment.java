@@ -2,6 +2,7 @@ package com.gautomation.chapiscorobot.ui.info;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,7 +53,9 @@ public class InfoFragment extends Fragment {
         myTimer.schedule(new TimerTask() {
             @Override
             public void run() {
+
                 getDados();
+                Log.d("Controle", "Inf: ");
             }
 
         }, 0, 500);

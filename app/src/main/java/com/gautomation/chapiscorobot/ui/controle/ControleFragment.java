@@ -3,10 +3,12 @@ package com.gautomation.chapiscorobot.ui.controle;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -19,15 +21,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.gautomation.chapiscorobot.MainActivity;
 import com.gautomation.chapiscorobot.R;
 import com.gautomation.chapiscorobot.RecumperarDados;
+import com.gautomation.chapiscorobot.Variaveis;
 import com.gautomation.chapiscorobot.api.Config_Chapisco_Service;
 import com.gautomation.chapiscorobot.model.Get_Dados;
 import com.gautomation.chapiscorobot.model.ValorInicial;
 import com.gautomation.chapiscorobot.model.ValorFinal;
 import com.gautomation.chapiscorobot.model.ControManual;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,6 +42,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
+import tech.gusavila92.websocketclient.WebSocketClient;
 
 
 public class ControleFragment extends Fragment {
@@ -44,7 +52,8 @@ public class ControleFragment extends Fragment {
     //Timer myTimer = new Timer();
     private String ValorInicial = "0";
     private String ValorFinal = "0";
-    private Button Ymais, Ymenos, Xmais, Xmenos, btngravainicio, btngravafinal, btnIniciar,
+    private Button Ymais, Ymenos, Xmais, Xmenos, btngravainicio,
+            btngravafinal, btnIniciar,
             btnArame1,
             btnArame2;
     private TextView txtStepsY, txtStepsX;
@@ -53,11 +62,15 @@ public class ControleFragment extends Fragment {
     private Switch SWdirecaodeoperaco;
     Timer myTimer = new Timer();
     private boolean flag;
+    private WebSocketClient webSocketClient;
 
+    @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_controle, container, false);
+
+        createWebSocketClient();
 
         Ymais = root.findViewById(R.id.btnYmais);
         Ymenos = root.findViewById(R.id.btnYmenos);
@@ -90,110 +103,143 @@ public class ControleFragment extends Fragment {
                 GravaPontoFinal(Integer.parseInt(Valor));
            }else{
                 Toast.makeText(getActivity(), "Posição Invalida",Toast.LENGTH_SHORT).show();
-
             }
         });
         // BOTÃO MAIS Y ==============
-        Ymais.setOnLongClickListener(v -> {
-            if(!StatusChapisco){
-                ComandosManual(11);
-                flag = true;
+        Ymais.setOnTouchListener((view, motionEvent) -> {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    if(!StatusChapisco)
+                        webSocketClient.send("11");
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if(StatusChapisco){
+                        webSocketClient.send("222");
+                    }else{
+                        webSocketClient.send("22");
+                    }
+                    break;
             }
-
             return false;
         });
-        Ymais.setOnClickListener(v -> {
-            if(flag){
-                ComandosManual(22);
-                flag = false;
-            }else{
-                ComandosManual(222);
-            }
-        });
+
         // ============================
         // BOTÃO MENOS Y ==============
-        Ymenos.setOnLongClickListener(v -> {
-            if(!StatusChapisco) {
-                ComandosManual(33);
-                flag = true;
+
+        // BOTÃO MAIS Y ==============
+        Ymenos.setOnTouchListener((view, motionEvent) -> {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    if(!StatusChapisco)
+                    webSocketClient.send("33");
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if(StatusChapisco){
+                        webSocketClient.send("444");
+                    }else{
+                        webSocketClient.send("44");
+                    }
+                    break;
             }
             return false;
         });
-        Ymenos.setOnClickListener(v -> {
-            if(flag){
-                ComandosManual(44);
-                flag = false;
-            }else{
-                ComandosManual(444);
-            }
 
-        });
         // =============================
 
         // BOTÃO MAIS X ==============
-        Xmais.setOnLongClickListener(v -> {
-            if(!StatusChapisco) {
-                ComandosManual(55);
-                flag = true;
+        Xmais.setOnTouchListener((view, motionEvent) -> {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    if(!StatusChapisco)
+                    webSocketClient.send("55");
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if(StatusChapisco){
+                        webSocketClient.send("666");
+                    }else{
+                        webSocketClient.send("66");
+                    }
+                    break;
             }
             return false;
-        });
-        Xmais.setOnClickListener(v -> {
-            if(flag){
-                ComandosManual(66);
-                flag = false;
-            }else{
-                ComandosManual(666);
-            }
         });
         // =============================
         // BOTÃO MENOS X ==============
-        Xmenos.setOnLongClickListener(v -> {
-            if(!StatusChapisco) {
-                ComandosManual(77);
-                flag = true;
+        Xmenos.setOnTouchListener((view, motionEvent) -> {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    if(!StatusChapisco)
+                    webSocketClient.send("77");
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if(StatusChapisco){
+                        webSocketClient.send("888");
+                    }else{
+                        webSocketClient.send("88");
+                    }
+                    break;
             }
             return false;
         });
-        Xmenos.setOnClickListener(v -> {
-            if(flag){
-                ComandosManual(88);
-                flag = false;
-            }else{
-                ComandosManual(888);
-            }
-        });
+//        Xmenos.setOnLongClickListener(v -> {
+//            if(!StatusChapisco) {
+//                ComandosManual(77);
+//                flag = true;
+//            }
+//            return false;
+//        });
+//        Xmenos.setOnClickListener(v -> {
+//            if(flag){
+//                ComandosManual(88);
+//                flag = false;
+//            }else{
+//                ComandosManual(888);
+//            }
+//        });
         // ==============================
-        btnIniciar.setOnClickListener(v ->ComandosManual(200));
+        btnIniciar.setOnClickListener(v -> webSocketClient.send("200"));
 
         // BOTÃO ARAME 1 ==============
-        btnArame1.setOnLongClickListener(v -> {
-            ComandosManual(110);
-             return false;
-        });
-        btnArame1.setOnClickListener(v -> {ComandosManual(120);});
-
-        // BOTÃO ARAME 2 ==============
-        btnArame2.setOnLongClickListener(v -> {
-            ComandosManual(130);
+        btnArame1.setOnTouchListener((view, motionEvent) -> {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    webSocketClient.send("110");
+                    break;
+                case MotionEvent.ACTION_UP:
+                    webSocketClient.send("120");
+                    break;
+            }
             return false;
         });
-        btnArame2.setOnClickListener(v -> {ComandosManual(140);});
+
+        // BOTÃO ARAME 2 ==============
+        btnArame2.setOnTouchListener((view, motionEvent) -> {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    webSocketClient.send("130");
+                    break;
+                case MotionEvent.ACTION_UP:
+                    webSocketClient.send("140");
+                    break;
+            }
+            return false;
+        });
 
 
         SWdirecaodeoperaco.setOnClickListener(v -> {
-            ComandosManual(100);
+            webSocketClient.send("100");
         });
 
 
 
-//        myTimer.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                controledeparada();
-//            }
-//
-//        }, 0, 100);
+        myTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getDadosEsp();
+                Log.d("Controle", "run: ");
+            }
+
+        }, 0, 1000);
 
         return root;
     }
@@ -400,9 +446,63 @@ public class ControleFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.reinicar) {
-            ComandosManual(300);
+            webSocketClient.send("300");
         }
         return super.onOptionsItemSelected(item);
+    }
+    private void createWebSocketClient() {
+        URI uri;
+        try {
+            // Connect to local host
+            uri = new URI("ws://192.168.4.1:81/");
+        }
+        catch (URISyntaxException e) {
+            e.printStackTrace();
+            return;
+        }
+        webSocketClient = new WebSocketClient(uri) {
+            @Override
+            public void onOpen() {
+                //Log.i("WebSocket", "Session is starting");
+                //webSocketClient.send("3424");
+            }
+            @Override
+            public void onTextReceived(String s) {
+                // Log.i("WebSocket", "Message received");
+                final String message = s;
+               // txtStepsY.setText("Eixo Y\n"+s);
+
+//                runOnUiThread(() -> {
+//                    try{
+//                        // TextView textView = findViewById(R.id.animalSound);
+//                    } catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+//                });
+            }
+            @Override
+            public void onBinaryReceived(byte[] data) {
+            }
+            @Override
+            public void onPingReceived(byte[] data) {
+            }
+            @Override
+            public void onPongReceived(byte[] data) {
+            }
+            @Override
+            public void onException(Exception e) {
+                System.out.println(e.getMessage());
+            }
+            @Override
+            public void onCloseReceived() {
+                //Log.i("", "Closed ");
+                //System.out.println("onCloseReceived");
+            }
+        };
+        webSocketClient.setConnectTimeout(10000);
+        webSocketClient.setReadTimeout(60000);
+        webSocketClient.enableAutomaticReconnection(5000);
+        webSocketClient.connect();
     }
     // ============================================================
     @Override
@@ -413,6 +513,7 @@ public class ControleFragment extends Fragment {
     @Override
     public void onStop() {
         myTimer.cancel();
+        webSocketClient.close();
         super.onStop();
     }
     @Override
